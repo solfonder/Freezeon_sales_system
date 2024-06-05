@@ -1,5 +1,5 @@
 """
-WSGI config for FSS project.
+WSGI config for Freezeon_sales_system project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'FSS.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Freezeon_sales_system.settings')
 
 application = get_wsgi_application()

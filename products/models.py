@@ -56,9 +56,9 @@ class Info(models.Model):
         return self.product_name
 
 
-class InfoSet(models.Model):
+class Info_Set(models.Model):
     parent_product = models.ForeignKey(Info,
                                        on_delete=models.CASCADE,
-                                       related_name='sets',
+                                       related_name='children',
                                        unique=False)
-    child_product = models.ForeignKey(Info, on_delete=models.CASCADE)
+    child_product = models.ForeignKey(Info, on_delete=models.CASCADE, related_name='parents')
