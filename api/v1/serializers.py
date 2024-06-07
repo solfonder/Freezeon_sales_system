@@ -5,19 +5,19 @@ from products.models import Info, Brand, Provider, Category, Info_Set
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['category_name']
+        fields = '__all__'
 
 
 class BrandSerializer(serializers.ModelSerializer):
     class Meta:
-        models = Brand
-        fields = ['brand_name']
+        model = Brand
+        fields = '__all__'
 
 
 class ProviderSerializer(serializers.ModelSerializer):
     class Meta:
-        models = Provider
-        fields = ['provider_name']
+        model = Provider
+        fields = '__all__'
 
 
 class InfoSetSerializer(serializers.ModelSerializer):
