@@ -1,5 +1,5 @@
 from rest_framework import generics
-from rest_framework.pagination import CustomLimitPagination
+from rest_framework.pagination import PageNumberPagination
 from products.models import Info, Provider, Brand, Category
 from .serializers import InfoSerializer, ProviderSerializer, BrandSerializer, CategorySerializer
 from django_filters.rest_framework import DjangoFilterBackend
@@ -18,7 +18,7 @@ class InfoListView(generics.ListAPIView):
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ['^article', '^product_name', '=status']
     filterset_fields = '__all__'
-    pagination_class = CustomLimitPagination
+    pagination_class = PageNumberPagination
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)

@@ -48,6 +48,8 @@ class Info(models.Model):
     stock = models.IntegerField()
 
     class Meta:
+        verbose_name = 'Товар'
+        verbose_name_plural = 'Товары'
         indexes = [
             models.Index(fields=['article', 'product_name'])
         ]

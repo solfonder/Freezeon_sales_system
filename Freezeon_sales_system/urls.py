@@ -19,8 +19,11 @@ from django.urls import path, include
 # from products import views
 from rest_framework import routers
 from api.v1 import api_views
+from products.models import Info, Brand, Provider, Category, Info_Set
 
 router = routers.DefaultRouter()
+admin.site.register([Info, Brand, Provider, Category, Info_Set])
+
 # router.register(r'users', views.UserViewSet)
 # router.register(r'groups', views.GroupViewSet)
 
