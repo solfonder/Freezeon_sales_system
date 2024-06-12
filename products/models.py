@@ -28,7 +28,7 @@ class Info(models.Model):
         FS = 'FOR SALE'
         SS = 'STOP STOCKS'
 
-    article = models.BigIntegerField(primary_key=True)
+    article = models.AutoField(primary_key=True)
     barcode = models.BigIntegerField()
     product_name = models.CharField(max_length=255)
     provider_name = models.ForeignKey(Provider,
@@ -41,7 +41,6 @@ class Info(models.Model):
                               choices=Status.choices,
                               default=Status.SS,
                               unique=False)
-    set = models.BooleanField(default=False, unique=False)
     category_name = models.ForeignKey(Category,
                                       unique=False,
                                       on_delete=models.CASCADE)

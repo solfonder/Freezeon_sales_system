@@ -1,10 +1,20 @@
-from rest_framework import generics
+import logging
+import pandas as pd
+import numpy as np
+from rest_framework import generics, filters
 from rest_framework.pagination import PageNumberPagination
 from products.models import Info, Provider, Brand, Category
 from .serializers import InfoSerializer, ProviderSerializer, BrandSerializer, CategorySerializer
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters
+from rest_framework.views import Response
 
+logger = logging.getLogger(__name__)
+logger.setLevel('DEBUG')
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(message)s')
+console_handler.setFormatter(formatter)
+logger.addHandler(console_handler)
 
 # @api_view()
 # def all_products(requset):
@@ -22,6 +32,11 @@ class InfoListView(generics.ListAPIView):
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        df = pd.read_excel('test.xlsx')
+        arr = df.values.T
+        return Response(arr)
 
 
 class InfoDetailView(generics.RetrieveAPIView):
