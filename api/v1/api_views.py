@@ -19,12 +19,6 @@ console_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
 
 
-# @api_view()
-# def all_products(requset):
-#     product = Info.objects.all()
-#     product_serializer = ProductSerializer(product, many=True)
-#     return Response(product_serializer.data)
-
 class InfoListView(generics.ListAPIView):
     queryset = Info.objects.all()
     serializer_class = InfoSerializer
@@ -38,9 +32,7 @@ class InfoListView(generics.ListAPIView):
 
     def post(self, request, *args, **kwargs):
         df = pd.read_excel('test.xlsx', 'Лист1')
-        # arr = df.values.T
         logger.info(df)
-        # with transaction.atomic():
         products = []
         for index, row in df.iterrows():
             provider_name = row['provider_name_id']
@@ -62,9 +54,20 @@ class InfoListView(generics.ListAPIView):
             }
 
             if not pd.isna(row['article']):
-                product_data['article'] = row['article']
+                try:
+                    existing_product = Info.objects.get(article=row['article'])
+                    existing_product.product_name = product_data['product_name']
+                    existing_product.provider_name = product_data['provider_name']
+                    existing_product.brand_name = product_data['brand_name']
+                    existing_product.category_name = product_data['category_name']
+                    existing_product.stock = product_data['stock']
+                    existing_product.save()
+                except Info.DoesNotExist:
+                    product_data['article'] = row['article']
+                    products.append(product_data)
 
-            products.append(product_data)
+            else:
+                products.append(product_data)
 
         Info.objects.bulk_create([Info(**data) for data in products])
 
@@ -89,10 +92,3 @@ class BrandListView(generics.ListAPIView):
 class CategoryListView(generics.ListAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-
-# class InfoSearchView(generics.ListAPIView):
-#     queryset = Info.objects
-#     # pagination_class =
-#
-#     def get(self, request, *args, **kwargs):
-#         response = request.GET
