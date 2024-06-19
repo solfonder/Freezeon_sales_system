@@ -31,6 +31,7 @@ class InfoSerializer(serializers.ModelSerializer):
     provider_name = serializers.StringRelatedField()
     category_name = serializers.StringRelatedField()
     set_info = serializers.SerializerMethodField()
+    # test_price = serializers.SerializerMethodField()
 
     class Meta:
         model = Info
@@ -38,6 +39,10 @@ class InfoSerializer(serializers.ModelSerializer):
         extra_fields = ['children']
 
     def get_set_info(self, obj):
-        inheritances = Info_Set.objects.filter(parent_product=obj)
+        inheritances = InfoSet.objects.filter(parent_product=obj)
         children_info = [inheritance.child_product for inheritance in inheritances]
         return InfoSetSerializer(children_info, many=True).data
+
+    # def get_test_price(self, obj):
+    #     price = Info.objects.filter(article=obj.article)..values('stock')[0]['stock']+100
+    #     return price

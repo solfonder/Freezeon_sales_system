@@ -4,12 +4,20 @@ from django.db import models
 class Provider(models.Model):
     provider_name = models.CharField(max_length=64, unique=True)
 
+    class Meta:
+        verbose_name = 'Поставщик'
+        verbose_name_plural = 'Поставщики'
+
     def __str__(self):
         return self.provider_name
 
 
 class Brand(models.Model):
     brand_name = models.CharField(max_length=64, unique=True)
+
+    class Meta:
+        verbose_name = 'Бренд'
+        verbose_name_plural = 'Бренды'
 
     def __str__(self):
         return self.brand_name
@@ -18,8 +26,37 @@ class Brand(models.Model):
 class Category(models.Model):
     category_name = models.CharField(max_length=64, unique=True)
 
+    class Meta:
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
+
     def __str__(self):
         return self.category_name
+
+
+class SaleType (models.Model):
+    sale_type_ft = models.CharField(max_length=64, unique=True)
+    sale_type_original = models.CharField(max_length=64, unique=False)
+
+    class Meta:
+        verbose_name = 'Тип скидки'
+        verbose_name_plural = 'Типы скидок'
+
+    def __str__(self):
+        return self.sale_type
+
+
+class Counterparty(models.Model):
+    counterparty_name = models.CharField(max_length=64, unique=True)
+    counterparty_markup = models.FloatField()
+    counterparty_risk = models.FloatField()
+
+    class Meta:
+        verbose_name = 'Контрагент'
+        verbose_name_plural = 'Контрагенты'
+
+    def __str__(self):
+        return self.counterparty_name
 
 
 class Info(models.Model):
@@ -37,14 +74,15 @@ class Info(models.Model):
     brand_name = models.ForeignKey(Brand,
                                    unique=False,
                                    on_delete=models.CASCADE)
-    status = models.CharField(max_length=20,
-                              choices=Status.choices,
-                              default=Status.SS,
-                              unique=False)
     category_name = models.ForeignKey(Category,
                                       unique=False,
                                       on_delete=models.CASCADE)
     stock = models.IntegerField()
+    sale_type = models.ForeignKey(SaleType,
+                                 unique=False,
+                                 on_delete=models.CASCADE)
+    dealer_price = models.FloatField()
+    recomended_price = models.FloatField()
 
     class Meta:
         verbose_name = 'Товар'
@@ -63,3 +101,18 @@ class InfoSet(models.Model):
                                        related_name='children',
                                        unique=False)
     child_product = models.ForeignKey(Info, on_delete=models.CASCADE, related_name='parents')
+
+
+class ProvidersSaleType(models.Model):
+    provider = models.ForeignKey(Provider, on_delete=models.CASCADE)
+    sale_type = models.ForeignKey(SaleType, on_delete=models.CASCADE)
+
+
+class ProvidersBrand(models.Model):
+    provider = models.ForeignKey(Provider, on_delete=models.CASCADE)
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
+
+
+class CounterpartySaleType(models.Model):
+    counterparty = models.ForeignKey(Counterparty, on_delete=models.CASCADE)
+    sale_type = models.ForeignKey(SaleType, on_delete=models.CASCADE)
