@@ -37,19 +37,19 @@ class Category(models.Model):
 class SaleType (models.Model):
     sale_type_ft = models.CharField(max_length=64, unique=True)
     sale_type_original = models.CharField(max_length=64, unique=False)
+    provider = models.ManyToManyField(Provider)
 
     class Meta:
         verbose_name = 'Тип скидки'
         verbose_name_plural = 'Типы скидок'
 
     def __str__(self):
-        return self.sale_type
+        return self.sale_type_ft
 
 
 class Counterparty(models.Model):
     counterparty_name = models.CharField(max_length=64, unique=True)
-    counterparty_markup = models.FloatField()
-    counterparty_risk = models.FloatField()
+    counterparty_risk = models.FloatField(default=0)
 
     class Meta:
         verbose_name = 'Контрагент'
@@ -80,9 +80,10 @@ class Info(models.Model):
     stock = models.IntegerField()
     sale_type = models.ForeignKey(SaleType,
                                  unique=False,
-                                 on_delete=models.CASCADE)
-    dealer_price = models.FloatField()
-    recomended_price = models.FloatField()
+                                 on_delete=models.CASCADE,
+                                 null=True)
+    dealer_price = models.FloatField(default=0, null=True)
+    recommended_price = models.FloatField(default=0, null=True)
 
     class Meta:
         verbose_name = 'Товар'
@@ -103,16 +104,7 @@ class InfoSet(models.Model):
     child_product = models.ForeignKey(Info, on_delete=models.CASCADE, related_name='parents')
 
 
-class ProvidersSaleType(models.Model):
-    provider = models.ForeignKey(Provider, on_delete=models.CASCADE)
-    sale_type = models.ForeignKey(SaleType, on_delete=models.CASCADE)
-
-
-class ProvidersBrand(models.Model):
-    provider = models.ForeignKey(Provider, on_delete=models.CASCADE)
-    brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
-
-
 class CounterpartySaleType(models.Model):
     counterparty = models.ForeignKey(Counterparty, on_delete=models.CASCADE)
     sale_type = models.ForeignKey(SaleType, on_delete=models.CASCADE)
+    counterparty_markup = models.FloatField(default=None)

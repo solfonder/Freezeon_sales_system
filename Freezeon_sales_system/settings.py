@@ -82,9 +82,9 @@ WSGI_APPLICATION = 'Freezeon_sales_system.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'ftdb',
-        'USER': 'dudanov',
-        'PASSWORD': '3228',
+        'NAME': 'test_db',
+        'USER': 'root',
+        'PASSWORD': 'root',
         'HOST': 'localhost',
         'PORT': '3306'
     }

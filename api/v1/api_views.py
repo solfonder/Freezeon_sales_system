@@ -1,11 +1,13 @@
 import logging
+
+import numpy as np
 import pandas as pd
 from django.db import transaction
 from rest_framework import generics, filters, status
 from rest_framework.pagination import PageNumberPagination
 
 from products import models
-from products.models import Info, Provider, Brand, Category
+from products.models import Info, Provider, Brand, Category, SaleType
 from .serializers import InfoSerializer, ProviderSerializer, BrandSerializer, CategorySerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.views import Response
@@ -31,26 +33,35 @@ class InfoListView(generics.ListAPIView):
         return self.list(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        df = pd.read_excel('test.xlsx', 'Лист1')
-        logger.info(df)
+        excel_products = pd.read_excel('test.xlsx', 'Товары')
+        excel_products = excel_products.replace(np.nan, None)
+        excel_counterparties = pd.read_excel('test.xlsx', 'Контрагенты')
+        logger.info(excel_products)
+        logger.info(excel_counterparties)
         products = []
-        for index, row in df.iterrows():
+        for index, row in excel_products.iterrows():
             provider_name = row['provider_name_id']
             brand_name = row['brand_name_id']
             category_name = row['category_name_id']
+            sale_type_ft = row['sale_type_ft']
+            if not pd.isna(row['child_products']):
+                logger.info(row['child_products'].split(', '))
 
             provider, created = Provider.objects.get_or_create(provider_name=provider_name)
             brand, created = Brand.objects.get_or_create(brand_name=brand_name)
             category, created = Category.objects.get_or_create(category_name=category_name)
+            sale_type_ft, created = SaleType.objects.get_or_create(sale_type_ft=sale_type_ft)
 
             product_data = {
                 'barcode': row['barcode'],
                 'product_name': row['product_name'],
-                'status': row['status'],
                 'provider_name': provider,
                 'brand_name': brand,
                 'category_name': category,
-                'stock': row['stock']
+                'stock': row['stock'],
+                'dealer_price': row['dealer_price'],
+                'recommended_price': row['recommended_price'],
+                'sale_type': sale_type_ft
             }
 
             if not pd.isna(row['article']):
@@ -58,7 +69,12 @@ class InfoListView(generics.ListAPIView):
 
             products.append(product_data)
 
-        Info.objects.bulk_create([Info(**data) for data in products])
+        # Info.objects.bulk_create([Info(**data) for data in products])
+
+        # for index, row in excel_counterparties.iterrows():
+        #     counterparty_name = row['counterparty_name']
+        #     counterparty_risk = row['counterparty_risk']
+        #     counterparty_markup = row['counterparty_markup']
 
         return Response("Data added successfully", status=status.HTTP_201_CREATED)
 
