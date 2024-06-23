@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from django.db import transaction
 from rest_framework import generics, filters, status
+from rest_framework.decorators import api_view
 from rest_framework.pagination import PageNumberPagination
 
 from products import models
@@ -19,6 +20,12 @@ console_handler.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(message)s')
 console_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
+
+
+@api_view(['GET'])
+async def test_get(request):
+    serializer = InfoSerializer(request)
+    return Response(serializer.data)
 
 
 class InfoListView(generics.ListAPIView):
@@ -69,7 +76,7 @@ class InfoListView(generics.ListAPIView):
 
             products.append(product_data)
 
-        # Info.objects.bulk_create([Info(**data) for data in products])
+        Info.objects.bulk_create([Info(**data) for data in products])
 
         # for index, row in excel_counterparties.iterrows():
         #     counterparty_name = row['counterparty_name']
