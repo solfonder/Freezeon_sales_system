@@ -77,7 +77,7 @@ class Info(models.Model):
     category_name = models.ForeignKey(Category,
                                       unique=False,
                                       on_delete=models.CASCADE)
-    stock = models.IntegerField()
+    stock = models.IntegerField(null=True)
     sale_type = models.ForeignKey(SaleType,
                                  unique=False,
                                  on_delete=models.CASCADE,

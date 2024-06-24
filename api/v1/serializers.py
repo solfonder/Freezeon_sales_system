@@ -21,6 +21,11 @@ class ProviderSerializer(serializers.ModelSerializer):
 
 
 class InfoSetSerializer(serializers.ModelSerializer):
+    brand_name = serializers.StringRelatedField()
+    provider_name = serializers.StringRelatedField()
+    category_name = serializers.StringRelatedField()
+    sale_type = serializers.StringRelatedField()
+
     class Meta:
         model = Info
         fields = '__all__'
@@ -59,8 +64,8 @@ class InfoSerializer(serializers.ModelSerializer):
 
             if counterparty:
                 dealer_price = obj.dealer_price or 0
-                risk_factor = (1 + counterparty['counterparty_risk'] / 100)
-                markup_factor = (1 + counterparty_markup['counterparty_markup'] / 100)
+                risk_factor = (1 + (counterparty['counterparty_risk'] / 100))
+                markup_factor = (1 + (counterparty_markup['counterparty_markup'] / 100))
                 price = dealer_price * risk_factor * markup_factor
-                return price
+                return round(price, 2)
 
