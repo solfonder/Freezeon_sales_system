@@ -5,7 +5,7 @@ import pandas as pd
 from django.db import transaction
 from rest_framework import generics, filters, status
 from rest_framework.decorators import api_view
-from rest_framework.pagination import PageNumberPagination
+from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination
 
 from products import models
 from products.models import Info, Provider, Brand, Category, SaleType
@@ -23,12 +23,12 @@ logger.addHandler(console_handler)
 
 
 class InfoListView(generics.ListAPIView):
-    queryset = Info.objects.all()
+    queryset = Info.objects.filter(included_products__isnull=False).distinct()
     serializer_class = InfoSerializer
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ['^article', '^product_name', '=status']
     filterset_fields = '__all__'
-    pagination_class = PageNumberPagination
+    pagination_class = LimitOffsetPagination
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)

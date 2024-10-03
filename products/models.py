@@ -70,12 +70,15 @@ class Info(models.Model):
     product_name = models.CharField(max_length=255)
     provider_name = models.ForeignKey(Provider,
                                       unique=False,
+                                      null=True,
                                       on_delete=models.CASCADE)
     brand_name = models.ForeignKey(Brand,
                                    unique=False,
+                                   null=True,
                                    on_delete=models.CASCADE)
     category_name = models.ForeignKey(Category,
                                       unique=False,
+                                      null=True,
                                       on_delete=models.CASCADE)
     stock = models.IntegerField(null=True)
     sale_type = models.ForeignKey(SaleType,
@@ -84,6 +87,8 @@ class Info(models.Model):
                                  null=True)
     dealer_price = models.FloatField(default=0, null=True)
     recommended_price = models.FloatField(default=0, null=True)
+    is_bundle = models.BooleanField(default=False)
+    included_products = models.ManyToManyField('self', blank=True, symmetrical=False)
 
     class Meta:
         verbose_name = 'Товар'
@@ -94,14 +99,6 @@ class Info(models.Model):
 
     def __str__(self):
         return self.product_name
-
-
-class InfoSet(models.Model):
-    parent_product = models.ForeignKey(Info,
-                                       on_delete=models.CASCADE,
-                                       related_name='children',
-                                       unique=False)
-    child_product = models.ForeignKey(Info, on_delete=models.CASCADE, related_name='parents')
 
 
 class CounterpartySaleType(models.Model):

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from products.models import Info, Brand, Provider, Category, InfoSet, Counterparty, CounterpartySaleType
+from products.models import Info, Brand, Provider, Category, Counterparty, CounterpartySaleType
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -20,34 +20,16 @@ class ProviderSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class InfoSetSerializer(serializers.ModelSerializer):
+class BaseInfoSerializer(serializers.ModelSerializer):
     brand_name = serializers.StringRelatedField()
     provider_name = serializers.StringRelatedField()
     category_name = serializers.StringRelatedField()
     sale_type = serializers.StringRelatedField()
-
-    class Meta:
-        model = Info
-        fields = '__all__'
-
-
-class InfoSerializer(serializers.ModelSerializer):
-    brand_name = serializers.StringRelatedField()
-    provider_name = serializers.StringRelatedField()
-    category_name = serializers.StringRelatedField()
-    sale_type = serializers.StringRelatedField()
-    set_info = serializers.SerializerMethodField()
     test_price = serializers.SerializerMethodField()
 
     class Meta:
         model = Info
         fields = '__all__'
-        extra_fields = ['children']
-
-    def get_set_info(self, obj):
-        inheritances = InfoSet.objects.filter(parent_product=obj)
-        children_info = [inheritance.child_product for inheritance in inheritances]
-        return InfoSetSerializer(children_info, many=True).data
 
     def get_test_price(self, obj):
         request_data = self.context['request'].data.get('data', {})
@@ -69,3 +51,9 @@ class InfoSerializer(serializers.ModelSerializer):
                 price = dealer_price * risk_factor * markup_factor
                 return round(price, 2)
 
+class IncludedProductSerializer(BaseInfoSerializer):
+    class Meta(BaseInfoSerializer.Meta):
+        pass
+
+class InfoSerializer(BaseInfoSerializer):
+    included_products = IncludedProductSerializer(many=True, read_only=True)
