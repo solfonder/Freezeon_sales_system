@@ -1,5 +1,7 @@
+import logging
+
 from rest_framework import serializers
-from products.models import Info, Brand, Provider, Category, Counterparty, CounterpartySaleType
+from products.models import Info, Brand, Provider, Category, Counterparty, CounterpartySaleType, ProductIncluded
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -20,20 +22,32 @@ class ProviderSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class CounterpartySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Counterparty
+        fields = '__all__'
+
 class BaseInfoSerializer(serializers.ModelSerializer):
     brand_name = serializers.StringRelatedField()
     provider_name = serializers.StringRelatedField()
     category_name = serializers.StringRelatedField()
     sale_type = serializers.StringRelatedField()
-    test_price = serializers.SerializerMethodField()
+    sale_price = serializers.SerializerMethodField()
+    dealer_price_currency = serializers.StringRelatedField()
+    recommended_price_currency = serializers.StringRelatedField()
 
     class Meta:
         model = Info
         fields = '__all__'
 
-    def get_test_price(self, obj):
-        request_data = self.context['request'].data.get('data', {})
-        counterparty_name = request_data.get('counterparty')
+    def get_sale_price(self, obj):
+        # request_data = self.context['request'].data.get('data', {})
+        # counterparty_name = request_data.get('counterparty')
+        # counterparty_markup = CounterpartySaleType.objects.filter(
+        #     counterparty__counterparty_name=counterparty_name,
+        #     sale_type=obj.sale_type
+        # ).values('counterparty_markup').first()
+        counterparty_name = self.context['request'].query_params.get('counterparty_name', None)
         counterparty_markup = CounterpartySaleType.objects.filter(
             counterparty__counterparty_name=counterparty_name,
             sale_type=obj.sale_type
@@ -51,9 +65,16 @@ class BaseInfoSerializer(serializers.ModelSerializer):
                 price = dealer_price * risk_factor * markup_factor
                 return round(price, 2)
 
-class IncludedProductSerializer(BaseInfoSerializer):
-    class Meta(BaseInfoSerializer.Meta):
-        pass
+class IncludedProductSerializer(serializers.ModelSerializer):
+    to_info = BaseInfoSerializer(read_only=True)
+
+    class Meta:
+        model = ProductIncluded
+        fields = ['to_info', 'quantity']
+
 
 class InfoSerializer(BaseInfoSerializer):
-    included_products = IncludedProductSerializer(many=True, read_only=True)
+    included_products = IncludedProductSerializer(many=True, read_only=True)  # Removed source argument
+
+    class Meta(BaseInfoSerializer.Meta):
+        fields = '__all__'

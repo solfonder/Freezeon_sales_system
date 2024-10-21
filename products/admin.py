@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Info, Brand, Provider, Category, Counterparty, CounterpartySaleType, SaleType
+from .models import (Info, Brand, Provider, Category,
+                     Counterparty, CounterpartySaleType, SaleType, Currency)
 
 class ProductAdmin(admin.ModelAdmin):
     list_display = ['article', 'product_name', 'is_bundle']
@@ -40,10 +41,15 @@ class SaleTypeAdmin(admin.ModelAdmin):
     list_display = ['sale_type_ft']
     search_fields = ['sale_type_ft']
 
+class CurrencyAdmin(admin.ModelAdmin):
+    list_display = ['code', 'name', 'exchange_rate']
+    search_fields = ['code', 'name', 'exchange_rate']
+
+
 admin.site.register(SaleType, SaleTypeAdmin)
 admin.site.register(Brand, BrandAdmin)
 admin.site.register(Provider, ProviderAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Counterparty, CounterpartyAdmin)
 admin.site.register(CounterpartySaleType, CounterpartySaleTypeAdmin)
-admin.site.register(Info, ProductAdmin)
+admin.site.register(Currency, CurrencyAdmin)
